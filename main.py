@@ -1,20 +1,10 @@
-import matplotlib.pyplot as plt
-import networkx as nx
+import random
+import collections
 
-G = nx.Graph()  # создаём объект графа
+res = random.choices(
+    population=[[0,10], [10,30], [30, 40], [40,50], [50,60], [60,70], [70,80], [80,100]],
+    weights=[0.05, 0.2, 0.3, 0.2, 0.1, 0.05, 0.025, 0.025],
+    k=100)
 
-# определяем список узлов (ID узлов)
-nodes = [1, 2, 3, 4, 5]
-
-# определяем список рёбер
-# список кортежей, каждый из которых представляет ребро
-# кортеж (id_1, id_2) означает, что узлы id_1 и id_2 соединены ребром
-edges = [(1, 2), (1, 3), (2, 3), (2, 4), (3, 5), (5, 5)]
-
-# добавляем информацию в объект графа
-G.add_nodes_from(nodes)
-G.add_edges_from(edges)
-
-# рисуем граф и отображаем его
-nx.draw(G, with_labels=True, font_weight='bold')
-plt.show()
+res = sorted(collections.Counter(map(str,res)).items())
+print(res)
