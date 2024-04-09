@@ -8,25 +8,28 @@ class Node:
         self.edges = edges
         self.availability = False
 
-r_Hall = Node(1,[2], False)
-scene = Node(2,[1,3], True)
-l_Hall = Node(3,[2], False)
+r_Hall = Node("Правый холл",1,[2], False)
+scene = Node("Сцена",2,[1,3], True)
+l_Hall = Node("Левый холл",3,[2], False)
 
 rooms = [r_Hall, scene, l_Hall]
 
 class Animatronic:
-    def __init__(self, number = 1, location = 2):
+    def __init__(self, name="", number = 1, pre_location = 0, real_location = 2, next_location = 0):
+        self.name = name
         self.number = number
-        self.location = location
+        self.real_location = real_location
     def move(self):
         for i in rooms:
-            if i.number == self.location:
-                self.location = random.choice(i.edges)
-                print(self.location)
+            if i.number == self.real_location:
+                self.real_location = random.choice(i.edges)
+                print(f"{self.name} перешел на {self.real_location}")
                 break
 
+freddy = Animatronic("Отбитый на голову Фредди")
+
+for i in range(5):
+    freddy.move()
 
 
-freddy = Animatronic()
 
-freddy.move()
