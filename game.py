@@ -1,6 +1,7 @@
 import time
 import random
-
+from tkinter import *
+from tkinter import ttk
 class Room:
     def __init__(self, name, number, edges=[], availability = False):
         self.name = name
@@ -13,11 +14,10 @@ class Office(Room):
         self.r_door = r_door
         self.l_door = l_door
 
-
 l_Hall = Room("Левый холл",1,[2,5], False)
 scene = Room("Сцена",2,[1,3], True)
 r_Hall = Room("Правый холл",3,[2,6], False)
-office = Office("Офис охранника",4, [], False, True, False)
+office = Office("Офис охранника",4, [], False, False, False)
 l_pocket = Room("Левый кармашек", 5, [1], False)
 r_pocket = Room("Правый кармашек", 6, [3], False)
 
@@ -41,9 +41,6 @@ class Animatronic:
                         next_location = y.name
                 print(f"{self.name} перешел в: {next_location}")
                 break
-
-
-
     def move_trajectory(self):
         real_trajectory = random.choice(self.trajectory)
         for i in rooms:
@@ -68,7 +65,8 @@ class Animatronic:
                 else:
                     self.real_location = 2
                     print("Отбитый на голову Фредди вернулся на сцену")
-
+            elif final_choice == False:
+                print("Отбитый на голову Фредди решил вернуться на сцену")
         if self.real_location == 6:
             time.sleep(random.choice([10]))
             final_choice = random.choice([True, False])
@@ -78,20 +76,39 @@ class Animatronic:
                 else:
                     self.real_location = 2
                     print("Отбитый на голову Фредди вернулся на сцену")
-
+            elif final_choice == False:
+                print("Отбитый на голову Фредди решил вернуться на сцену")
 
 
 freddy = Animatronic("Отбитый на голову Фредди",1, 0, 2, [[1,5],[3,6]])
 
 animatronics = [freddy]
-# for i in range(10):
-#     freddy.move()
-#     time.sleep(1)
+def start_game(animatronics, rooms, office):
+    window = Tk()
+    window.geometry('450x400+400+200')
+    window.title('FNAF')
 
-# def start_game(animatronics, rooms):
-#
+    l_btn_text = StringVar(value="OFF")
+    r_btn_text = StringVar(value="OFF")
+    def l_lockdoor():
+        if office.l_door == False:
+            l_btn_text.set("ON")
+            office.l_door = True
+        elif office.r_door == False:
+            l_btn_text.set("OFF")
+            office.l_door = False
 
+    def r_lockdoor():
+        if office.r_door == False:
+            r_btn_text.set("ON")
+            office.r_door = True
+        else:
+            r_btn_text.set("OFF")
+            office.r_door = False
 
+    l_button = Button(textvariable=l_btn_text, height=3, width=10, command=l_lockdoor).place(x=100,y=0)
+    r_button = Button(textvariable=r_btn_text, height=3, width=10, command=r_lockdoor).place(x=200,y=0)
+    window.mainloop()
 
-
+start_game(animatronics, rooms, office)
 freddy.move_trajectory()
