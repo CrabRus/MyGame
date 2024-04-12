@@ -1,8 +1,7 @@
-from tkinter import *
-from tkinter import ttk
-root = Tk()
-frm = ttk.Frame(root, padding=10)
-frm.grid()
-ttk.Label(frm, text="Hello World!").grid(column=0, row=1)
-ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=0)
-root.mainloop()
+from tkinter import messagebox
+
+res = messagebox.askquestion('Message title', 'Message ask content')
+res = messagebox.askyesno('Message title', 'Message y/n content')
+res = messagebox.askyesnocancel('Message title', 'Message y/n/cancel content')
+res = messagebox.askokcancel('Message title', 'Message ok/cancel content')
+res = messagebox.askretrycancel('Message title', 'Message retry/cancel content')
