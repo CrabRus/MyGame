@@ -11,9 +11,10 @@ class Room:
         self.availability = False
 
 class Office(Room):
-    def __init__(self,name, number, edges=[], availability = False, r_door = False, l_door = False):
+    def __init__(self,name, number, edges=[], availability = False, r_door = False, l_door = False, energy_count = 100):
         self.r_door = r_door
         self.l_door = l_door
+        self.energy_count = energy_count
 
 l_Hall = Room("Левый холл",1,[2,5], False)
 scene = Room("Сцена",2,[1,3], True)
@@ -51,9 +52,11 @@ class Animatronic:
                             if z.number == self.real_location:
                                 next_location = z.name
                         print(f"{self.name} перешел в: {next_location}")
-                        self.attack_office()
+                        w_l = self.attack_office()
+                        if w_l == 1:
+                            print(w_l)
                         time.sleep(3)
-                    break
+            break
 
     def attack_office(self):
         if self.real_location == 5:
@@ -62,40 +65,70 @@ class Animatronic:
             if final_choice == True:
                 if office.l_door == False:
                     print("Отбитый на голову Фредди вошел в офис офранника с левой двери")
+                    return 1
                 else:
                     self.real_location = 2
                     print("Отбитый на голову Фредди вернулся на сцену")
+                    return 0
             elif final_choice == False:
                 print("Отбитый на голову Фредди решил вернуться на сцену")
+                return 0
         if self.real_location == 6:
-            time.sleep(random.choice([10]))
+            time.sleep(random.choice([7, 8, 9, 10]))
             final_choice = random.choice([True, False])
             if final_choice == True:
                 if office.r_door == False:
                     print("Отбитый на голову Фредди вошел в офис офранника с правой двери")
+                    return 1
                 else:
                     self.real_location = 2
                     print("Отбитый на голову Фредди вернулся на сцену")
+                    return 0
             elif final_choice == False:
                 print("Отбитый на голову Фредди решил вернуться на сцену")
+                return 0
 
 # def move_animatronics(animatronics):
 #     for i in animatronics:
 
 def start_game(animatronics, rooms, office):
-    thr = threading.Thread(target=freddy.move_trajectory)
-    thr.start()
-    window = Tk()
-    window.geometry('400x400+400+200')
-    window.title('FNAF')
+    def update_energy():
+        while True:
+            energy_label_text.set(f"Энергия: {office.energy_count}%")
+            print(office.energy_count)
+            time.sleep(1)
 
-    l_btn_text = StringVar(value="OFF")
-    r_btn_text = StringVar(value="OFF")
+    def loss_energy_left_door(energy_count):
+        while True:
+            if office.l_door:
+                energy_count = energy_count - 2
+                time.sleep(1)
+            elif office.l_door == False:
+                time.sleep(1)
+
+
+    def loss_energy_right_door(energy_count):
+        while True:
+            if office.r_door:
+                energy_count = energy_count - 2
+                time.sleep(1)
+            elif office.r_door == False:
+                time.sleep(1)
+
+
+    def loss_energy(ConditionDoor):
+        while True:
+            if ConditionDoor:
+                office.energu_count -= 2
+            elif ConditionDoor == False:
+                continue
+            time.sleep(1)
+
     def l_lockdoor():
         if office.l_door == False:
             l_btn_text.set("ON")
             office.l_door = True
-        elif office.r_door == False:
+        elif office.l_door == True:
             l_btn_text.set("OFF")
             office.l_door = False
 
@@ -106,11 +139,34 @@ def start_game(animatronics, rooms, office):
         else:
             r_btn_text.set("OFF")
             office.r_door = False
+
+
+    threadLossEnergyLeft = threading.Thread(target=loss_energy, args=(office.l_door, ))
+    threadLossEnergyRight = threading.Thread(target=loss_energy, args=(office.r_door, ))
+    threadMove = threading.Thread(target=freddy.move_trajectory)
+    threadUpdateEnergy = threading.Thread(target=update_energy, args=())
+
+    window = Tk()
+    window.geometry('400x400+400+200')
+    window.title('FNAF')
+
+    l_btn_text = StringVar(value="OFF")
+    r_btn_text = StringVar(value="OFF")
+    energy_label_text = StringVar(value=f"Энергия: {office.energy_count}%")
+
     label_l_door = Label(text="Левая дверь").pack()
-    l_button = Button(textvariable=l_btn_text, height=3, width=10, command=l_lockdoor).pack()
+    l_button = Button(textvariable=l_btn_text, height=3, width=10, command=l_lockdoor()).pack()
     label_r_door=Label(text="Правая дверь").pack()
-    r_button = Button(textvariable=r_btn_text, height=3, width=10, command=r_lockdoor).pack()
+    r_button = Button(textvariable=r_btn_text, height=3, width=10, command=r_lockdoor()).pack()
+    energy_label = Label(textvariable=energy_label_text).pack()
+
+    threadMove.start()
+    threadUpdateEnergy.start()
+    threadLossEnergyLeft.start()
+    threadLossEnergyRight.start()
     window.mainloop()
+
+
 
 rooms = [r_Hall, scene, l_Hall, r_pocket, l_pocket]
 freddy = Animatronic("Отбитый на голову Фредди",1, 0, 2, [[1,5],[3,6]])
