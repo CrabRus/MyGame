@@ -12,11 +12,12 @@ class Room:
         self.availability = availability
 
 class Office(Room):
-    def __init__(self,name, number, edges=[], availability = False, r_door = False, l_door = False, energy_count = 100.0, use_energy = 0):
+    def __init__(self,name, number, edges=[], availability = False, r_door = False, l_door = False, energy_count = 100.0, use_energy = 0, w_l = False):
         self.r_door = r_door
         self.l_door = l_door
         self.energy_count = energy_count
         self.use_energy = use_energy
+        self.w_l = w_l
 
 l_Hall = Room("Левый холл",1,[2,5], False)
 scene = Room("Сцена",2,[1,3,4], True)
@@ -44,7 +45,7 @@ class Animatronic:
                 print(f"{self.name} перешел в: {next_location}")
                 break
     def move_trajectory(self):
-        while True:
+        while office.w_l == True:
             real_trajectory = random.choice(self.trajectory)
             for i in rooms:
                 if i.number == self.real_location:
@@ -53,14 +54,9 @@ class Animatronic:
                         for z in rooms:
                             if z.number == self.real_location:
                                 next_location = z.name
-                        print(f"{self.name} перешел в: {next_location}")
-
-                        w_l = self.attack_office()
-                        if w_l == True:
-                            print(w_l)
-                            break
-                        time.sleep()
-            break
+                            print(f"{self.name} перешел в: {next_location}")
+                        office.w_l = self.attack_office()
+                    time.sleep(random.choice([2,3,4]))
 
     def attack_office(self):
         if self.real_location == 5:
@@ -78,6 +74,9 @@ class Animatronic:
                 self.real_location = 2
                 print("Отбитый на голову Фредди решил вернуться на сцену")
                 return False
+        else:
+            pass
+
         if self.real_location == 6:
             time.sleep(random.choice([7, 8, 9, 10]))
             final_choice = random.choice([True, False])
@@ -93,7 +92,8 @@ class Animatronic:
                 self.real_location = 2
                 print("Отбитый на голову Фредди решил вернуться на сцену")
                 return False
-
+        else:
+            pass
 # def move_animatronics(animatronics):
 #     for i in animatronics:
 
@@ -103,9 +103,15 @@ def start_game(animatronics, rooms, office):
         while True:
             if office.energy_count >0:
                 office.energy_count = office.energy_count - 0.1 - (office.use_energy*0.7)
-                energy_label_text.set(f"Энергия: {office.energy_count.__round__(1)}%")
-                print(office.energy_count.__round__(1))
-                time.sleep(1)
+                if office.energy_count >0:
+                    energy_label_text.set(f"Энергия: {office.energy_count.__round__(1)}%")
+                    print(office.energy_count.__round__(1))
+
+                elif office.energy_count <=0:
+                    office.energy_count =0
+                    energy_label_text.set(f"Энергия: {office.energy_count.__round__(1)}%")
+                    print(office.energy_count.__round__(1))
+            time.sleep(1)
 
     def l_lockdoor():
         if office.l_door == False:
